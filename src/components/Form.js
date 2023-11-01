@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import * as Yup from "yup";
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import axios from 'axios';
 
 function MyForm() {
     const [formData, setFormData] = useState({
@@ -37,10 +40,22 @@ function MyForm() {
         agreeTerms: ""
     });
     useEffect(() => {
+        console.log("formdata > ", formData);
+    }, [formData]);
+
+    useEffect(() => {
+        console.error("form error > ", formErrors);
+    }, [formErrors]);
+
+    useEffect(() => {
         formSchema
             .isValid(formData)
             .then(valid => setFormValid(valid));
     }, [formData]);
+    useEffect(() => {
+        formData && setFormData(formData);
+    }, [formData]);
+
 
 
 
@@ -49,15 +64,27 @@ function MyForm() {
         const newValue = type === 'checkbox' ? checked : value;
 
         setFormData({
-            ...formData,
-            [name]: newValue,
+            ...formData, [name]: newValue,
         });
-        Yup.reach(formSchema, name)
-            .validate(value)
-            .then(valid => { setFormErrors({ ...formErrors, [name]: "" }); })
-            .catch(err => { setFormErrors({ ...formErrors, [name]: err.errors[0] }); });
+
+        checkValidationFor(name, newValue);
 
     };
+
+    const checkValidationFor = (field, value) => {
+        Yup.reach(formSchema, field)
+            .validate(value)
+            .then(valid => {
+                setFormErrors({ ...formErrors, [field]: "" });
+            })
+            .catch(err => {
+                console.log("HATA! ", field, err.errors[0]);
+                setFormErrors((prevFormErrors) => ({
+                    ...prevFormErrors, [field]: err.errors[0],
+                }));
+            });
+
+    }
     const handleSubmit = (event) => {
         event.preventDefault();
 
@@ -65,56 +92,76 @@ function MyForm() {
 
     };
 
+
+
     return (
-        <form onSubmit={handleSubmit}>
-            <label>
-                İsim:
-                <input
-                    type="text"
+        <Form>
+            <Form.Group className="mb-3" controlId="formBasicName">
+                <Form.Label>İsim</Form.Label>
+                <Form.Control
                     name="name"
+                    type="text"
+                    placeholder="İsminizi giriniz"
                     value={formData.name}
-                    onChange={handleChange} />
-            </label>
-
-            <br />
-
-            <label>
-                Email:
-                <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange} />
-            </label>
-
-            <br />
-
-            <label>
-                Şifre:
-                <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange} />
-            </label>
-
-            <br />
-
-            <label>
-                Kullanım Şartları:
-                <input
-                    type="checkbox"
-                    name="agreeTerms"
-                    checked={formData.agreeTerms}
                     onChange={handleChange}
+                    isInvalid={!!formErrors.name}
                 />
-            </label>
+                <Form.Control.Feedback type="invalid">
+                    {formErrors.name}
+                </Form.Control.Feedback>
+            </Form.Group>
 
-            <br />
+            <Form.Group className="mb-3" controlId="formBasicEmail">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                    name="email"
+                    type="email"
+                    placeholder="Email giriniz"
+                    value={formData.email}
+                    onChange={handleChange}
+                    isInvalid={!!formErrors.email}
+                />
+                <Form.Control.Feedback type="invalid">
+                    {formErrors.email}
+                </Form.Control.Feedback>
+            </Form.Group>
 
-            <button type="submit">Gönder</button>
-        </form>
+
+            <Form.Group className="mb-3" controlId="formBasicPassword">
+                <Form.Label>Şifre</Form.Label>
+                <Form.Control
+                    name="password"
+                    type="password"
+                    placeholder="Şifre"
+                    value={formData.password}
+                    onChange={handleChange}
+                    isInvalid={!!formErrors.password}
+                />
+                <Form.Control.Feedback type="invalid">
+                    {formErrors.password}
+                </Form.Control.Feedback>
+            </Form.Group>
+
+
+            <Form.Group className="mb-3" controlId="formBasicCheckbox">
+                <Form.Check
+                    name="agreeTerms"
+                    type="checkbox"
+                    label="Kullanıcı Sözleşmesi"
+                    value={formData.agreeTerms}
+                    onChange={handleChange} />
+            </Form.Group>
+
+
+            <Button
+                variant="primary"
+                type="submit"
+                onChange={handleSubmit}>
+                Kaydet
+            </Button>
+        </Form>
+
     );
-}
+};
 
 export default MyForm;

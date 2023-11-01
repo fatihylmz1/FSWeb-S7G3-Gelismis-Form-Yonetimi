@@ -59,4 +59,3 @@ Aşağıda, projeniz için MVP yi sağladıktan sonra denemeniz gereken zorlu he
 - [ ] Formunuza bir dropdown menü ekleyin. Stateinize bir `rol` değeri atayın ve kullanıcılara değişik roller atamak için dropdown ekleyin.
 - [ ] Formunuza istediğiniz 3 yeni input (doğrulama ve hata mesajlarıyla birlikte) ekleyin
 - [ ] Eğer bir kullanıcı `waffle@syrup.com` mail adresini girerse, mevcut doğrulayıcınıza, bu email adresinin daha önce eklendiği uyarısını verecek bir handling ekleyin.
-
